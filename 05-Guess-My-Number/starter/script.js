@@ -15,7 +15,6 @@
 }
 // Defining secretNumber
 let secretNumber = Math.trunc(Math.random() * 20 + 1);
-document.querySelector('.number').textContent = secretNumber;
 // Defining starting score
 let score = 20;
 let highscore = 0;
@@ -37,7 +36,7 @@ document.querySelector('.check').addEventListener('click', function () {
   if (!guess) {
     displayMessage('No value inserted!');
     // If the guess number is equal to the secretNumber
-  } else if (guess > 20) {
+  } else if (guess > 20 || guess < 1) {
     displayMessage('Duuh it is between 1 and 20!');
   } else if (guess === secretNumber) {
     displayMessage('🎊 You have found the number! 🥳');
@@ -68,7 +67,6 @@ document.querySelector('.again').addEventListener('click', function () {
   document.querySelector('.number').style.width = '15rem';
   secretNumber = Math.trunc(Math.random() * 20 + 1);
   document.querySelector('.number').textContent = '?';
-  document.querySelector('.number').textContent = secretNumber;
   document.querySelector('.check').disabled = false;
   // Keeping record of previous highscore
   if (!highscore) setHighscore(highscore);
