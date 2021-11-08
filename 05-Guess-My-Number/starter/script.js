@@ -14,8 +14,7 @@
 </section> */
 }
 // Defining secretNumber
-const secretNumber = Math.trunc(Math.random() * 20 + 1);
-document.querySelector('.number').textContent = secretNumber;
+let secretNumber = Math.trunc(Math.random() * 20 + 1);
 // Defining starting score
 let score = 20;
 let highscore = 0;
@@ -28,13 +27,19 @@ document.querySelector('.check').addEventListener('click', function () {
   if (!guess) {
     document.querySelector('.message').textContent = 'No value inserted! ';
     // If the guess number is equal to the secretNumber
+  } else if (guess > 20) {
+    document.querySelector('.message').textContent =
+      'Duuh it is between 1 and 20!';
   } else if (guess === secretNumber) {
     document.querySelector('.message').textContent =
       '🎊 You have found the number! 🥳';
     document.querySelector('body').style.backgroundColor = '#60b347';
     document.querySelector('.number').style.width = '30rem';
-    highscore = score;
-    document.querySelector('.highscore').textContent = score;
+    if (score > highscore) {
+      highscore = score;
+      document.querySelector('.highscore').textContent = score;
+    }
+    document.querySelector('.number').textContent = secretNumber;
     document.querySelector('.check').disabled = true;
     // If the guess number is below the secretNumber
   } else if (guess < secretNumber) {
@@ -59,11 +64,13 @@ document.querySelector('.check').addEventListener('click', function () {
   }
 });
 document.querySelector('.again').addEventListener('click', function () {
-  document.querySelector('body').style.backgroundColor = 'black';
+  document.querySelector('body').style.backgroundColor = '#222';
   document.querySelector('.guess').value = '';
   document.querySelector('.score').textContent = '20';
   document.querySelector('.message').textContent = 'Start guessing...';
   document.querySelector('.number').style.width = '15rem';
+  secretNumber = Math.trunc(Math.random() * 20 + 1);
+  document.querySelector('.number').textContent = '?';
   // Keeping record of previous highscore
   if (!highscore) document.querySelector('.highscore').textContent = highscore;
 });
