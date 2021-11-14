@@ -17,14 +17,30 @@ const rollBtn = document.querySelector('.btn--roll');
 const holdBtn = document.querySelector('.btn--hold');
 const newBtn = document.querySelector('.btn--new');
 
+let score, activePlayer, currentScore, playing;
+
 // Starting conditions
-score0El.textContent = 0;
-score1El.textContent = 0;
-diceImage.classList.add('hidden');
-let activePlayer = 0;
-let currentScore = 0;
-const score = [0, 0];
-let playing = true;
+const init = function () {
+  // Set all scores to 0
+  activePlayer = 0;
+  currentScore = 0;
+  playing = true;
+  score = [0, 0];
+
+  // Set activePlayer to zero
+  score0El.textContent = 0;
+  score1El.textContent = 0;
+  current0El.textContent = 0;
+  current1El.textContent = 0;
+
+  // Hide/add player-active and player--winner
+  diceImage.classList.add('hidden');
+  player0El.classList.add('player--active');
+  player1El.classList.remove('player--active');
+  player0El.classList.remove('player--winner');
+  player1El.classList.remove('player--winner');
+};
+init();
 
 // Declaring Switch user
 const switchPlayer = function () {
@@ -76,7 +92,6 @@ holdBtn.addEventListener('click', function () {
       playing = false;
       //   Hide dice
       diceImage.classList.add('hidden');
-      alert(`Player ${activePlayer} wins with ${score[activePlayer]} points!`);
     } else {
       // Switch player
       switchPlayer();
@@ -84,24 +99,4 @@ holdBtn.addEventListener('click', function () {
   }
 });
 
-newBtn.addEventListener('click', function () {
-  // Set all scores to 0
-  let score = [0, 0];
-  score0El.textContent = 0;
-  score1El.textContent = 0;
-  current0El.textContent = 0;
-  current1El.textContent = 0;
-  // Toggle playing true
-  playing = true;
-
-  // Hide dice button
-  diceImage.classList.add('hidden');
-  // Hide/add player-active and player--winner
-  document
-    .querySelector(`.player--${activePlayer}`)
-    .classList.remove('player--winner');
-  player0El.classList.add('player--active');
-  player1El.classList.remove('player--active');
-  // Set activePlayer to zero
-  activePlayer = 0;
-});
+newBtn.addEventListener('click', init);
