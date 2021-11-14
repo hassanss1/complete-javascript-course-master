@@ -21,17 +21,17 @@ let score, activePlayer, currentScore, playing;
 
 // Starting conditions
 const init = function () {
-  // Set all scores to 0
-  activePlayer = 0;
-  currentScore = 0;
-  playing = true;
-  score = [0, 0];
-
   // Set activePlayer to zero
   score0El.textContent = 0;
   score1El.textContent = 0;
   current0El.textContent = 0;
   current1El.textContent = 0;
+
+  // Set all scores to 0
+  activePlayer = 0;
+  currentScore = 0;
+  playing = true;
+  score = [0, 0];
 
   // Hide/add player-active and player--winner
   diceImage.classList.add('hidden');
