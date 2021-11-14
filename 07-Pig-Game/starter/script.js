@@ -15,6 +15,7 @@ const diceImage = document.querySelector('.dice');
 // Buttons
 const rollBtn = document.querySelector('.btn--roll');
 const holdBtn = document.querySelector('.btn--hold');
+const newBtn = document.querySelector('.btn--new');
 
 // Starting conditions
 score0El.textContent = 0;
@@ -72,8 +73,13 @@ holdBtn.addEventListener('click', function () {
         .querySelector(`.player--${activePlayer}`)
         .classList.remove('player--active');
       // Deactivate buttons or turn playing off
+      playing = false;
+      //   Hide dice
+      diceImage.classList.add('hidden');
+      alert(`Player ${activePlayer} wins with ${score[activePlayer]} points!`);
+    } else {
+      // Switch player
+      switchPlayer();
     }
-    // Switch player
-    switchPlayer();
   }
 });
