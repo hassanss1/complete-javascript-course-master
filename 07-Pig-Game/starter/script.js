@@ -83,3 +83,25 @@ holdBtn.addEventListener('click', function () {
     }
   }
 });
+
+newBtn.addEventListener('click', function () {
+  // Set all scores to 0
+  let score = [0, 0];
+  score0El.textContent = 0;
+  score1El.textContent = 0;
+  current0El.textContent = 0;
+  current1El.textContent = 0;
+  // Toggle playing true
+  playing = true;
+
+  // Hide dice button
+  diceImage.classList.add('hidden');
+  // Hide/add player-active and player--winner
+  document
+    .querySelector(`.player--${activePlayer}`)
+    .classList.remove('player--winner');
+  player0El.classList.add('player--active');
+  player1El.classList.remove('player--active');
+  // Set activePlayer to zero
+  activePlayer = 0;
+});
