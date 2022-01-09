@@ -138,5 +138,4 @@ for (const [x, player] of game.scored.entries())
 //      {
 //        Gnarby: 1,
 //        Hummels: 1,
-//        Lewandowski: 2
-// }
+//        Lewandowski: 2}
