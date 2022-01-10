@@ -114,28 +114,38 @@ const printGoals = function (...players) {
   // print number of goals
   // console.log(`${players.length} goals scored!`);
   // iterate through element given
-//   for (const [i, player] of game.scored.entries())
-//     console.log(`Goal ${i + 1}: ${player}`);
-// };
-// For calling the function with the array inside the object game
-// we have to spread it first, because otherwise it will parse an Array
-// to the function and it would only return [Array1()] as result of the function
-printGoals(...game.scored);
-
+  //   for (const [i, player] of game.scored.entries())
+  //     console.log(`Goal ${i + 1}: ${player}`);
+  // };
+  // For calling the function with the array inside the object game
+  // we have to spread it first, because otherwise it will parse an Array
+  // to the function and it would only return [Array1()] as result of the function
+  printGoals(...game.scored);
+};
 // For the odds we need to use the Logical Assignment Operators with short circuiting
 team1 < team2 && console.log('Team 1 is more likely to win');
 team1 > team2 && console.log('Team 2 is more likely to win');
 
 // 1. Loopoverthegame.scoredarrayandprinteachplayernametotheconsole, along with the goal number (Example: "Goal 1: Lewandowski")
-for (const [x, player] of game.scored.entries())
-  console.log(`Goal ${x + 1}: ${player}`);
+for (const [x, player] of game.scored.entries()) {
+  // console.log(`Goal ${x + 1}: ${player}`);
+}
 // 2. Usealooptocalculatetheaverageoddandlogittotheconsole(Wealready studied how to calculate averages, you can go check if you don't remember)
-// 3. Printthe3oddstotheconsole,butinaniceformattedway,exactlylikethis:
+// sum the total of the values and then divide it by three
+console.log(game.odds);
+const odds = Object.values(game.odds);
+let average = 0;
+for (const odd of odds) {
+  average += odd;
+  console.log(odd);
+}
+console.log(`${average / odds.length}`);
+
+// Printthe3oddstotheconsole,butinaniceformattedway,exactlylikethis:
 // Odd of victory Bayern Munich: 1.33 Odd of draw: 3.25
 // Odd of victory Borrussia Dortmund: 6.5
 // Get the team names directly from the game object, don't hardcode them (except for "draw"). Hint: Note how the odds and the game objects have the same property names 😉
-// 4. Bonus:Createanobjectcalled'scorers'whichcontainsthenamesofthe players who scored as properties, and the number of goals as the value. In this game, it will look like this:
-//      {
-//        Gnarby: 1,
-//        Hummels: 1,
-//        Lewandowski: 2}
+for (const [team, odd] of Object.entries(game.odds)) {
+  const teamStr = team === 'x' ? 'draw' : `victory ${game[team]}`;
+  console.log(`Odd of ${teamStr}: ${odd}`);
+}
