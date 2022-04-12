@@ -101,7 +101,7 @@ const displayMovements = function (acc, sorted) {
     const day = `${date.getDate()}`.padStart(2, 0);
     const month = `${date.getMonth()}`.padStart(2, 0);
     const year = date.getFullYear();
-    const displayDate = `${date}/${month}/${year}`;
+    const displayDate = `${day}/${month}/${year}`;
 
     const html = `<div class="movements__row">
           <div class="movements__type movements__type--${type}">${
@@ -189,7 +189,13 @@ btnLoan.addEventListener('click', function (e) {
   e.preventDefault();
   const loan = Number(inputLoanAmount.value);
   if (loan > 0 && currentAccount.movements.some(mov => mov > loan * 0.1)) {
+    // Get the Loan
     currentAccount.movements.push(loan);
+
+    // Push to Movements dates
+    currentAccount.movementsDates.push(new Date());
+
+    // Update UI
     updateUI(currentAccount);
   }
   inputLoanAmount.value = '';
@@ -202,15 +208,21 @@ btnTransfer.addEventListener('click', function (e) {
   const amount = Number(inputTransferAmount.value);
   const receiver = accounts.find(acc => acc.username === inputTransferTo.value);
   inputTransferAmount.value = inputTransferTo.value = '';
-  console.log(receiver);
   if (
     amount > 0 &&
     receiver &&
     amount <= currentAccount.balance &&
     receiver.username !== currentAccount.username
   ) {
+    // Do the transfer
     receiver.movements.push(amount);
     currentAccount.movements.push(-amount);
+
+    // Update the date
+    currentAccount.movementsDates.push(new Date());
+    receiver.movementsDates.push(new Date());
+
+    // Update UI
     updateUI(currentAccount);
   }
 });
