@@ -88,16 +88,26 @@ const calcDisplayBalance = function (acc) {
 };
 
 // Display movements
-const displayMovements = function (movements, sorted) {
+const displayMovements = function (acc, sorted) {
   containerMovements.innerHTML = '';
-  const mov = sorted ? movements.slice().sort((a, b) => b - a) : movements;
+  const mov = sorted
+    ? acc.movements.slice().sort((a, b) => b - a)
+    : acc.movements;
 
   mov.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
+
+    const date = new Date(acc.movementsDates[i]);
+    const day = `${date.getDate()}`.padStart(2, 0);
+    const month = `${date.getMonth()}`.padStart(2, 0);
+    const year = date.getFullYear();
+    const displayDate = `${date}/${month}/${year}`;
+
     const html = `<div class="movements__row">
           <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
+          <div class="movements__date">${displayDate}</div>
           <div class="movements__value">${mov}€</div>
         </div>`;
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -137,7 +147,7 @@ const updateUI = function (acc) {
   // Display balance
   calcDisplayBalance(acc);
   // Display movements
-  displayMovements(acc.movements);
+  displayMovements(acc);
   // Display summary
   calcDisplaySummary(acc);
 };
@@ -164,6 +174,13 @@ btnLogin.addEventListener('click', function (e) {
     inputLoginPin.blur();
     // update UI
     updateUI(currentAccount);
+    const dateNow = new Date();
+    const day = `${dateNow.getDate()}`.padStart(2, 0);
+    const month = `${dateNow.getMonth()}`.padStart(2, 0);
+    const year = dateNow.getFullYear();
+    const hour = dateNow.getHours();
+    const min = dateNow.getMinutes();
+    labelDate.textContent = `${day}/${month}/${year} ${hour}:${min}`;
   }
 });
 
