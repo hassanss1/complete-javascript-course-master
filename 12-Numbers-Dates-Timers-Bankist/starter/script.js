@@ -88,7 +88,7 @@ const calcDisplayBalance = function (acc) {
 };
 
 // Calculate days passed
-const formatDate = function (date) {
+const formatDate = function (date, locale) {
   const calcDaysPassed = (date1, date2) => {
     return Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
   };
@@ -97,10 +97,11 @@ const formatDate = function (date) {
   if (daysPassed === 1) return `Yesterday`;
   if (daysPassed <= 7) return `${daysPassed} days ago`;
   else {
-    const day = `${date.getDate()}`.padStart(2, 0);
-    const month = `${date.getMonth()}`.padStart(2, 0);
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+    // const day = `${date.getDate()}`.padStart(2, 0);
+    // const month = `${date.getMonth()}`.padStart(2, 0);
+    // const year = date.getFullYear();
+    // return `${day}/${month}/${year}`;
+    return new Intl.DateTimeFormat(locale).format(date);
   }
 };
 // Display movements
@@ -116,7 +117,7 @@ const displayMovements = function (acc, sorted) {
     // The date of the movement
     const date = new Date(acc.movementsDates[i]);
     // Display the date depending on how many days passed
-    const displayDate = formatDate(date);
+    const displayDate = formatDate(date, acc.locale);
 
     const html = `<div class="movements__row">
           <div class="movements__type movements__type--${type}">${
@@ -190,12 +191,23 @@ btnLogin.addEventListener('click', function (e) {
     // update UI
     updateUI(currentAccount);
     const dateNow = new Date();
-    const day = `${dateNow.getDate()}`.padStart(2, 0);
-    const month = `${dateNow.getMonth()}`.padStart(2, 0);
-    const year = dateNow.getFullYear();
-    const hour = `${dateNow.getHours()}`.padStart(2, 0);
-    const min = `${dateNow.getMinutes()}`.padStart(2, 0);
-    labelDate.textContent = `${day}/${month}/${year} ${hour}:${min}`;
+    // const day = `${dateNow.getDate()}`.padStart(2, 0);
+    // const month = `${dateNow.getMonth()}`.padStart(2, 0);
+    // const year = dateNow.getFullYear();
+    // const hour = `${dateNow.getHours()}`.padStart(2, 0);
+    // const min = `${dateNow.getMinutes()}`.padStart(2, 0);
+    const options = {
+      hour: 'numeric',
+      minutes: 'numeric',
+      year: 'numeric',
+      day: 'numeric',
+      month: 'long',
+      weekday: 'long',
+    };
+    labelDate.textContent = new Intl.DateTimeFormat(
+      currentAccount.locale,
+      options
+    ).format(dateNow);
   }
 });
 
