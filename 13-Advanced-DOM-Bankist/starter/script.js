@@ -152,7 +152,7 @@ const revealSections = function () {
 const lazyLoadImages = function () {
   // Selections
   // Select all images that contain class features__img
-  const imgTargets = querySelectorAll('img[data-src]');
+  const imgTargets = document.querySelectorAll('img[data-src]');
 
   // Functions
   // to change their src before they appear on window view
@@ -178,8 +178,8 @@ const lazyLoadImages = function () {
     threshold: 0,
   });
 
-  // Observe images
-  imgObserver.observe(imgTargets);
+  // Observe each image
+  imgTargets.forEach(img => imgObserver.observe(img));
 };
 
 // Initialization
