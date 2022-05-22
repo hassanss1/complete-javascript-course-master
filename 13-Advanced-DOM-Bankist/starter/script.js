@@ -182,6 +182,90 @@ const lazyLoadImages = function () {
   imgTargets.forEach(img => imgObserver.observe(img));
 };
 
+// Slider component
+const slideSlider = function () {
+  // selectors
+  const slides = document.querySelectorAll('.slide');
+  const btnLeft = document.querySelector('.slider__btn--left');
+  const btnRight = document.querySelector('.slider__btn--right');
+  const slider = document.querySelector('.slider');
+  let curSlide = 0;
+  const maxSlide = slides.length;
+
+  const dotContainer = document.querySelector('.dots');
+
+  // Start creating the dots
+  const createDots = function () {
+    slides.forEach(function (_, i) {
+      dotContainer.insertAdjacentHTML(
+        'beforeend',
+        `<button class="dots__dot" data-slide="${i}"></button>`
+      );
+    });
+  };
+  createDots();
+
+  const activateDot = function (slide) {
+    document
+      .querySelectorAll('.dots__dot')
+      .forEach(dot => dot.classList.remove('dots__dot--active'));
+
+    document
+      .querySelector(`.dots__dot[data-slide="${slide}"]`)
+      .classList.add('dots__dot--active');
+  };
+
+  // THIS IS FOR STUDY ONLY transform property in each slide
+  // slides.forEach((s, i) => (s.style.transform = `translateX(${100 * i}%)`));
+  // slider.style.transform = 'scale(0.3)';
+  // slider.style.overflow = 'visible';
+
+  const goToSlide = function (slide) {
+    slides.forEach(
+      (s, i) => (s.style.transform = `translateX(${100 * (i - slide)}%)`)
+    );
+  };
+
+  // Calling goToSlide(0) to make it display the first slide, as done in line 196
+  goToSlide(0);
+
+  // functions
+  const nextSlide = function () {
+    if (curSlide === maxSlide - 1) {
+      curSlide = 0;
+    } else {
+      curSlide++;
+    }
+    goToSlide(curSlide);
+    activateDot(curSlide);
+  };
+
+  const prevSlide = function () {
+    if (curSlide === 0) {
+      curSlide = maxSlide;
+    }
+    curSlide--;
+    goToSlide(curSlide);
+    activateDot(curSlide);
+  };
+  // handlers
+  btnRight.addEventListener('click', nextSlide);
+  btnLeft.addEventListener('click', prevSlide);
+  dotContainer.addEventListener('click', function (e) {
+    if (e.target.classList.contains('dots__dot')) {
+      const { slide } = e.target.dataset;
+      goToSlide(slide);
+      activateDot(slide);
+    }
+  });
+
+  // Listening to pressing arrow keys
+  document.addEventListener('keydown', function (e) {
+    e.key === 'ArrowRight' && nextSlide();
+    e.key === 'ArrowLeft' && prevSlide();
+  });
+};
+
 // Initialization
 const init = function () {
   tabbedComponent();
@@ -189,5 +273,6 @@ const init = function () {
   stickyMenu();
   revealSections();
   lazyLoadImages();
+  slideSlider();
 };
 init();
