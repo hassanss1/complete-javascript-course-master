@@ -190,11 +190,8 @@ class App {
     // hide the form
 
     // Clear input fields
-    inputDistance.value =
-      inputCadence.value =
-      inputDuration.value =
-      inputElevation.value =
-        '';
+      this._hideForm();
+
   }
   _renderWorkoutMarker(workout) {
     L.marker(workout.coords)
@@ -259,6 +256,18 @@ class App {
     `;
       form.insertAdjacentHTML('afterend', html);
   }
+  _hideForm() {
+        // Empty the input
+    inputDistance.value =
+      inputCadence.value =
+      inputDuration.value =
+      inputElevation.value =
+        '';
+      form.style.display = 'none';
+      form.classList.add('hidden');
+      setTimeout(()=> form.style.display = 'grid', 1000)
+  }
+  
 }
 
 const app = new App();
