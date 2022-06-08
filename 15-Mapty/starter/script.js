@@ -39,7 +39,7 @@ class Workout {
     } ${this.date.getDate()}`;
   }
   click() {
-    this.click++;
+    this.clicks++;
   }
 }
 
@@ -97,7 +97,12 @@ class App {
 
   constructor() {
     //   once the new object is created, the constructor is called, so we get position here
+    // Get user's position
     this._getPosition();
+
+    // Get data from local storage
+    this._getLocalStorage();
+    // Attach event handlers
     //   It is necessary to add event listeners to the constructor because we want them to be listened from the beginning, not
     // just when a function is called
     form.addEventListener('submit', this._newWorkout.bind(this));
@@ -132,6 +137,12 @@ class App {
 
     //   handling clicks on map
     this.#map.on('click', this._showForm.bind(this));
+
+    // This was in setLocalStorage but it won't work because the map is not yet loaded.
+    // so I added this here to call the method when the map has been loaded.
+    this.#workouts.forEach(work => {
+      this._renderWorkoutMarker(work);
+    });
   }
 
   _showForm(mapE) {
@@ -198,6 +209,9 @@ class App {
 
     // Clear input fields
     this._hideForm();
+
+    // Set local storage to all workouts
+    this._setLocalStorage();
   }
   _renderWorkoutMarker(workout) {
     L.marker(workout.coords)
@@ -291,7 +305,30 @@ class App {
       },
     });
     // using the public interface
-    workout.click();
+    // workout.click();
+  }
+  _setLocalStorage() {
+    // localStorage is an API that the browser provides us
+    // we should not use it to store big amounts of data because it slows down the app
+    localStorage.setItem(
+      'workouts',
+      // This is to turn an object into a string
+      // WE WILL LOSE PROTOTYPE CHAIN!
+      JSON.stringify(this.#workouts)
+    );
+  }
+  _getLocalStorage() {
+    // JSON.parse is to make string an object
+    // WE WILL LOSE PROTOTYPE CHAIN!
+    const data = JSON.parse(localStorage.getItem('workouts'));
+
+    if (!data) return;
+
+    this.#workouts = data;
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work);
+      this._renderWorkoutMarker(work);
+    });
   }
 }
 
