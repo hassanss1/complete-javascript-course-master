@@ -76,7 +76,6 @@ class Cycling extends Workout {
 
 // const run1 = new Running([32, -19], 5.2, 24, 178);
 // const cycling1 = new Cycling([32, -19], 27, 10, 523);
-// console.log(run1, cycling1);
 
 ////////////////////////////////////////////////////////
 // APPLICATION ARCHITECTURE
@@ -93,49 +92,69 @@ class App {
   #map;
   #mapZoomLevel = 13;
   #mapEvent;
+
+  // create empty workouts array to be used later
   #workouts = [];
 
   constructor() {
-    //   once the new object is created, the constructor is called, so we get position here
+    // once the new App object is created, the constructor is called, so we get position here
     // Get user's position
     this._getPosition();
 
-    // Get data from local storage
+    // Get data from local storage (if there is any logic is inside it)
     this._getLocalStorage();
+
     // Attach event handlers
-    //   It is necessary to add event listeners to the constructor because we want them to be listened from the beginning, not
+    //  It is necessary to add event listeners in the constructor because we want them to be listened from the beginning, not
     // just when a function is called
+
+    // for when the form is submitted, create new workout
     form.addEventListener('submit', this._newWorkout.bind(this));
+
+    // for when the workout type is changed, change from/to elevation/cadence
     inputType.addEventListener('change', this._toggleElevationField);
+
+    // for when the user clicks in one workout
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
 
   _getPosition() {
     if (navigator.geolocation) {
+      // from navigator __proto__ we have this navigator.geolocation method
+
       navigator.geolocation.getCurrentPosition(
+        // this function has 2 arguments of callback functions, the first is the coordinates to be loaded,
+        // the second is if it does not work
+        // we have to bind with the this keyword to reference to the object calling it
+        // Then we call the function to load the map parsing the geolocation of the user
         this._loadMap.bind(this),
         function () {
-          alert('Could not get your location!');
+          alert(
+            'Could not get your location! Please check your internet connection or if you are allowing the page to access your location.'
+          );
         }
       );
     }
   }
 
   _loadMap(position) {
+    // navigator.geolocation returns a huge object with many props, we get coords from it
     const { latitude } = position.coords;
     const { longitude } = position.coords;
-    console.log(`https://google.pt/maps/@${latitude},${longitude}`);
 
+    // assemble coords into one variable
     const coords = [latitude, longitude];
-    //   assing map with those coordinates
+
+    //   assing map with those coords (comes from the map API LeafLet)
     this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
 
+    // setting props of the map to the #map variable
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
         '&copy: <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
 
-    //   handling clicks on map
+    //   handling clicks on map (because only the API would be able to proper listen inside the map)
     this.#map.on('click', this._showForm.bind(this));
 
     // This was in setLocalStorage but it won't work because the map is not yet loaded.
@@ -146,7 +165,9 @@ class App {
   }
 
   _showForm(mapE) {
+    // we grab from _loadMap method the this keyword - note, we are already listening to form submition even when hidden
     this.#mapEvent = mapE;
+    // showing up form again
     form.classList.remove('hidden'),
       // for good UI focus on distance input field
       inputDistance.focus();
@@ -158,8 +179,12 @@ class App {
   }
 
   _newWorkout(e) {
+    // Helper functions to validate data before creating workouts
+    // first to see if the input is not a number
+    // tip: the ...rest creates an array to be interated with
     const validInputs = (...inputs) =>
       inputs.every(inp => Number.isFinite(inp));
+    // second to check if they are all positive numbers
     const allPositive = (...inputs) => inputs.every(inp => inp > 0);
 
     e.preventDefault();
@@ -292,12 +317,10 @@ class App {
   _moveToPopup(e) {
     //   Guard clause to ignore clicks without workout element
     const workoutEl = e.target.closest('.workout');
-    console.log(workoutEl);
     if (!workoutEl) return;
     const workout = this.#workouts.find(
       work => work.id === workoutEl.dataset.id
     );
-    console.log(workout);
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
       animate: true,
       pan: {
@@ -329,6 +352,12 @@ class App {
       this._renderWorkout(work);
       this._renderWorkoutMarker(work);
     });
+  }
+
+  reset() {
+    localStorage.removeItem('workouts');
+    // to reload the page
+    location.reload();
   }
 }
 
