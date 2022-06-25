@@ -92,6 +92,7 @@ class App {
   #map;
   #mapZoomLevel = 13;
   #mapEvent;
+  #editWorkout;
   // create empty workouts array to be used later
   #workouts = [];
 
@@ -358,6 +359,7 @@ class App {
       // the dataset of the clicked obj has many keys, we then grab the id
       work => work.id === workoutEl.dataset.id
     );
+    this.#editWorkout = workout
 
     // For editing objects we need to open their form with all values they contain
     this._showForm(workout);
@@ -401,6 +403,9 @@ class App {
     localStorage.removeItem('workouts');
     // to reload the page
     location.reload();
+  }
+  _deleteWorkout() {
+    this.#workouts.removeItem(work => work.id === this.#editWorkout.id);
   }
 }
 
