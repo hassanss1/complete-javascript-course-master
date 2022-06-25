@@ -92,7 +92,6 @@ class App {
   #map;
   #mapZoomLevel = 13;
   #mapEvent;
-
   // create empty workouts array to be used later
   #workouts = [];
 
@@ -136,7 +135,6 @@ class App {
       );
     }
   }
-
   _loadMap(position) {
     // navigator.geolocation returns a huge object with many props, we get coords from it
     const { latitude } = position.coords;
@@ -163,21 +161,29 @@ class App {
       this._renderWorkoutMarker(work);
     });
   }
-
   _showForm(mapE) {
     // we grab from _loadMap method the this keyword - note, we are already listening to form submition even when hidden
     this.#mapEvent = mapE;
     // showing up form again
-    form.classList.remove('hidden'),
-      // for good UI focus on distance input field
-      inputDistance.focus();
-  }
+    form.classList.remove('hidden');
 
+    // If there is already an object, open form with its attributes
+    if (mapE.id) {
+      mapE.inputDistance.textContent = mapE.distance;
+      mapE.inputDuration.textContent = mapE.duration;
+      mapE.inputCadence
+        ? (mapE.inputCadence.textContent = mapE.cadence)
+        : (mapE.inputElevation.textContent = mapE.elevation);
+      mapE.inputType.textContent = mapE.type;
+    }
+
+    // for good UI focus on distance input field
+    inputDistance.focus();
+  }
   _toggleElevationField() {
     inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
     inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
   }
-
   _newWorkout(e) {
     // Helper functions to validate data before creating workouts
     // first to see if the input is not a number
@@ -193,10 +199,11 @@ class App {
     const type = inputType.value;
     const distance = +inputDistance.value; // '+' is converting to number
     const duration = +inputDuration.value;
+    // the mapEvent contain the workout element or the
     const { lat, lng } = this.#mapEvent.latlng;
     let workout;
 
-    //   cadence and elevation we will do later to validate data
+    //   cadence and elevation we will do with logical operator later to validate data
 
     // if workout running, then create running obj
     if (type === `running`) {
@@ -208,7 +215,18 @@ class App {
       )
         return alert('Inputs have to be positive numbers!'); // guard clause, if any value is not a number
 
-      workout = new Running([lat, lng], distance, duration, cadence);
+      // if there is no previous obj, create new one with new id
+      if (!this.#mapEvent.id)
+        workout = new Running([lat, lng], distance, duration, cadence);
+
+      // if there is a previous obj,
+      if (this.#mapEvent.id) {
+        // grab workout as #mapEvent
+        workout = this.#mapEvent;
+        workout.distance = distance;
+        workout.duration = duration;
+        workout.cadence = cadence;
+      }
     }
 
     // if workout cycling, then create cycling obj
@@ -219,11 +237,25 @@ class App {
         !allPositive(distance, duration)
       )
         return alert('Inputs have to be positive numbers!'); // guard clause, if any value is not a number
-      workout = new Cycling([lat, lng], distance, duration, elevation);
+
+      // if there is no previous obj, create new one with new id
+      if (!this.#mapEvent.id)
+        workout = new Cycling([lat, lng], distance, duration, elevation);
+      // if there is a previous obj,
+      if (this.#mapEvent.id) {
+        // grab workout as #mapEvent
+        workout = this.#mapEvent;
+        workout.distance = distance;
+        workout.duration = duration;
+        workout.elevation = elevation;
+      }
     }
 
-    // Add new object to the workout array
-    this.#workouts.push(workout);
+    // Add new object to the workout array if there is no previous object
+    if (!this.#mapEvent.id) this.#workouts.push(workout);
+
+    // If there is object, find the one with the same and id and replace with updated workout
+    this.#workouts.find(work => work.id === this.#mapEvent.id) = workout;
 
     // render workout on map as a marker
     this._renderWorkoutMarker(workout);
@@ -317,10 +349,22 @@ class App {
   _moveToPopup(e) {
     //   Guard clause to ignore clicks without workout element
     const workoutEl = e.target.closest('.workout');
+    // If there is no workout, return
     if (!workoutEl) return;
+
+    // send clicked workout to 'workout' variable by using its id
     const workout = this.#workouts.find(
+      // this will find one object inside the workouts array that has the same id
+      // the dataset of the clicked obj has many keys, we then grab the id
       work => work.id === workoutEl.dataset.id
     );
+
+    // For editing objects we need to open their form with all values they contain
+    this._showForm(workout);
+    // but just when the form is submitted
+    form.addEventListener('submit', _newWorkout.bind(this));
+
+    // then we set the view of the #map object using workout coordinates, and passing view options found in the API website
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
       animate: true,
       pan: {
@@ -353,7 +397,6 @@ class App {
       this._renderWorkoutMarker(work);
     });
   }
-
   reset() {
     localStorage.removeItem('workouts');
     // to reload the page
