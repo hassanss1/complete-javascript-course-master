@@ -44,7 +44,7 @@ const renderCountry = (data, className = '') => {
           <article class="country ${className}">
           <img class="country__img" src="${data.flag}" />
           <div class="country__data">
-            <h3 class="country__name">${data.country}</h3>
+            <h3 class="country__name">${data.name}</h3>
             <h4 class="country__region">${data.region}</h4>
             <p class="country__row"><span>👫</span>${(
               +data.population / 1000000
@@ -136,16 +136,18 @@ const renderErr = message => {
 
 // Encapsulating fetch and response handler
 
-const getJSON = function (url, errorMsg = 'Something went wrong') {
+const getJSON = (url, errorMsg = 'Something went wrong') => {
   fetch(url).then(response => {
-    if (!response.ok) throw new Error(`${errorMsg} (${response.status})`);
+    if (!response.ok) {
+      throw new Error(`${errorMsg} (${response.status})`);
+    }
 
     return response.json();
   });
 };
 
 const getCountryData = function (country) {
-  getJSON(`https://restcountries.com/v2/alpha/${country}`, 'Country not found')
+  getJSON(`https://restcountries.com/v2/name/${country}`, 'Country not found')
     .then(data => {
       renderCountry(data[0]);
       const neighbour = data[0].borders?.[0];
@@ -154,7 +156,7 @@ const getCountryData = function (country) {
 
       // Country 2
       return getJSON(
-        `https://restcountries.com/v2/alpha/${country}`,
+        `https://restcountries.com/v2/name/${country}`,
         'Country not found'
       );
     })
@@ -164,3 +166,28 @@ const getCountryData = function (country) {
     })
     .finally(() => (countriesContainer.style.opacity = 1));
 };
+
+// Coding challange #1
+// https://geocode.xyz/51.50354,-0.12768?geoit=json
+const whereAmI = function (lat, lng) {
+  // getJSON(`https://geocode.xyz/${lat},${lng}?geoit=json`, 'Country not found')
+  fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
+    .then(res => {
+      if (!res.ok) throw new Error(`Problem with geocoding ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      console.log(`You are in ${data.city}, ${data.country}`);
+      return fetch(`https://restcountries.com/v2/name/${data.country}`);
+    })
+    .then(res => {
+      if (!res.ok) throw new Error(`Problem with geocoding ${res.status}`);
+      return res.json();
+    })
+    .then(data => renderCountry(data[0]))
+    .catch(err => console.log(`${err.message}`))
+    .finally((countriesContainer.style.opacity = 1));
+};
+whereAmI(52.508, 13.381);
+whereAmI(19.037, 72.873);
+whereAmI(-33.933, 18.474);
