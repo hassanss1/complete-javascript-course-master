@@ -345,57 +345,85 @@ const renderErr = message => {
 //   })
 //   .catch(err => console.log(err));
 
-// ////////////////////////////////////// Consuming promises with async / await //////////////////////////////////////
-const getPosition = function () {
-  return new Promise(function (resolve, reject) {
-    // navigator.geolocation.getCurrentPosition(
-    //   position => resolve(position),
-    //   err => reject(new Error(err))
-    // );
-    navigator.geolocation.getCurrentPosition(resolve, reject);
+// // ////////////////////////////////////// Consuming promises with async / await //////////////////////////////////////
+// const getPosition = function () {
+//   return new Promise(function (resolve, reject) {
+//     // navigator.geolocation.getCurrentPosition(
+//     //   position => resolve(position),
+//     //   err => reject(new Error(err))
+//     // );
+//     navigator.geolocation.getCurrentPosition(resolve, reject);
+//   });
+// };
+
+// const whereAmI = async function () {
+//   try {
+//     // Geolocation
+//     const pos = await getPosition();
+//     const { latitude: lat, longitude: lng } = pos.coords;
+
+//     // Reversed geocoding
+//     const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+//     // we need to throw new error here because fetch rejects in particular case (403, 404) so we need more awareness on errors here
+//     if (!resGeo.ok) throw new Error(`Problem getting country`);
+
+//     const dataGeo = await resGeo.json();
+
+//     // Country data
+//     const res = await fetch(
+//       `https://restcountries.com/v2/name/${dataGeo.country}`
+//     );
+//     const countryData = await res.json();
+//     renderCountry(countryData[0]);
+
+//     return `You are in ${dataGeo.city}, ${dataGeo.country}`;
+//   } catch (err) {
+//     renderErr(`${err.message}`);
+
+//     // reject promise returned from async function
+//     throw err;
+//   }
+// };
+// // whereAmI()
+// //   .then(city => console.log(`2: ${city}`))
+// //   .catch(err => console.error(`2: ${err.message}`))
+// //   .finally(() => console.log(`3: finished getting locatin`));
+
+// (async function () {
+//   try {
+//     const city = await whereAmI();
+//     console.log(`2: ${city}`);
+//   } catch (err) {
+//     console.error(`2: ${err.message}`);
+//   }
+//   console.log(`3: finished getting locatin`);
+// })();
+
+// Running parallel async functions
+
+const getJSON = (url, errorMsg = 'Something went wrong') => {
+  fetch(url).then(response => {
+    if (!response.ok) {
+      throw new Error(`${errorMsg} (${response.status})`);
+    }
+
+    return response.json();
   });
 };
-getPosition().then(position => console.log(position));
 
-const whereAmI = async function () {
+const getCountries = async function (c1, c2, c3) {
   try {
-    // Geolocation
-    const pos = await getPosition();
-    const { latitude: lat, longitude: lng } = pos.coords;
-
-    // Reversed geocoding
-    const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
-    // we need to throw new error here because fetch rejects in particular case (403, 404) so we need more awareness on errors here
-    if (!resGeo.ok) throw new Error(`Problem getting country`);
-
-    const dataGeo = await resGeo.json();
-
-    // Country data
-    const res = await fetch(
-      `https://restcountries.com/v2/name/${dataGeo.country}`
-    );
-    const data = await res.json();
-    renderCountry(data[0]);
-
-    return `You are in ${dataGeo.city}, ${dataGeo.country}`;
+    // const [data1] = await getJSON(`https://restcountries.com/v2/name/${c1}`);
+    // const [data2] = await getJSON(`https://restcountries.com/v2/name/${c2}`);
+    // const [data3] = await getJSON(`https://restcountries.com/v2/name/${c3}`);
+    const data = await Promise.all([
+      // One rejected promise will make entire thing reject as well.
+      getJSON(`https://restcountries.com/v2/name/${c1}`),
+      getJSON(`https://restcountries.com/v2/name/${c2}`),
+      getJSON(`https://restcountries.com/v2/name/${c3}`),
+    ]);
+    console.log(`${data.map(country => country[0].capital)}`);
   } catch (err) {
-    renderErr(`${err.message}`);
-
-    // reject promise returned from async function
-    throw err;
+    console.log(err.message);
   }
 };
-// whereAmI()
-//   .then(city => console.log(`2: ${city}`))
-//   .catch(err => console.error(`2: ${err.message}`))
-//   .finally(() => console.log(`3: finished getting locatin`));
-
-(async function () {
-  try {
-    const city = await whereAmI();
-    console.log(`2: ${city}`);
-  } catch (err) {
-    console.error(`2: ${err.message}`);
-  }
-  console.log(`3: finished getting locatin`);
-})();
