@@ -206,44 +206,85 @@ const countriesContainer = document.querySelector('.countries');
 // // from the two console logs
 // // callback settimeout and promise will finish on the same time but promise has priority
 
-// Simulating a lottery with promise (building a promise)
-const lotteryPromise = new Promise(function (resolve, reject) {
-  console.log('Lotter draw is happening');
-  // to encapsulate some async behaviour we use the setTimeout
-  setTimeout(() => {
-    // the executor function will contain the asynchronous behavior that we are trying to handle with the promise
-    // this executer should produce a resolved value, future value of the promise
-    if (Math.random() >= 0.5) {
-      // in order to say that the promise is fulfilled we then use the resolve() function
-      // whatever value we put in the resolve will be the value that is going to be sent to the then() handler
-      resolve('You WIN!');
-    } else {
-      // In the reject we pass the error message that is goind to be handled with the catch() method
-      // Creating an Error object is actually better
-      reject(new Error('You lost but helped someone become richer.'));
-    }
-  }, 2000);
-});
-// To consume the promise
-lotteryPromise.then(res => console.log(res)).catch(err => console.log(err));
+// ///////////////////////////////// BUILDING FIRST PROMISE AND FIRST PROMISIFYING ////////////////////////////////////
 
-// Promisifying setTimeout
-const wait = function (seconds) {
-  // create and return the promise, usually what we do. from there return a promise after
-  // will encapsulate the async operation even further
-  // this is exactly what the fetch() function does, it returns a promise
+// // Simulating a lottery with promise (building a promise)
+// const lotteryPromise = new Promise(function (resolve, reject) {
+//   console.log('Lotter draw is happening');
+//   // to encapsulate some async behaviour we use the setTimeout
+//   setTimeout(() => {
+//     // the executor function will contain the asynchronous behavior that we are trying to handle with the promise
+//     // this executer should produce a resolved value, future value of the promise
+//     if (Math.random() >= 0.5) {
+//       // in order to say that the promise is fulfilled we then use the resolve() function
+//       // whatever value we put in the resolve will be the value that is going to be sent to the then() handler
+//       resolve('You WIN!');
+//     } else {
+//       // In the reject we pass the error message that is goind to be handled with the catch() method
+//       // Creating an Error object is actually better
+//       reject(new Error('You lost but helped someone become richer.'));
+//     }
+//   }, 2000);
+// });
+// // To consume the promise
+// lotteryPromise.then(res => console.log(res)).catch(err => console.log(err));
 
-  // don't even need the reject function because timeout never fails
-  return new Promise(function (resolve) {
-    setTimeout(resolve, seconds * 1000);
+// // Promisifying setTimeout
+// const wait = function (seconds) {
+//   // create and return the promise, usually what we do. from there return a promise after
+//   // will encapsulate the async operation even further
+//   // this is exactly what the fetch() function does, it returns a promise
+
+//   // don't even need the reject function because timeout never fails
+//   return new Promise(function (resolve) {
+//     setTimeout(resolve, seconds * 1000);
+//   });
+// };
+// // this function will wait 2 seconds and return a resolved promise
+// wait(2)
+//   .then(() => {
+//     console.log('I waited for 2 seconds');
+//     return wait(1);
+//   })
+//   .then(() => {
+//     console.log('I waited for 1 second');
+//   });
+
+// PROMISIFYING GEOLOCATION API
+
+// callback based api into promise
+
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    // navigator.geolocation.getCurrentPosition(
+    //   position => resolve(position),
+    //   err => reject(new Error(err))
+    // );
+    navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 };
-// this function will wait 2 seconds and return a resolved promise
-wait(2)
-  .then(() => {
-    console.log('I waited for 2 seconds');
-    return wait(1);
-  })
-  .then(() => {
-    console.log('I waited for 1 second');
-  });
+getPosition().then(position => console.log(position));
+
+const whereAmI = function () {
+  getPosition()
+    .then(pos => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    })
+    .then(res => {
+      if (!res.ok) throw new Error(`Problem with geocoding ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      console.log(`You are in ${data.city}, ${data.country}`);
+      return fetch(`https://restcountries.com/v2/name/${data.country}`);
+    })
+    .then(res => {
+      if (!res.ok) throw new Error(`Problem with geocoding ${res.status}`);
+      return res.json();
+    })
+    .then(data => renderCountry(data[0]))
+    .catch(err => console.log(`${err.message}`))
+    .finally((countriesContainer.style.opacity = 1));
+};
+btn.addEventListener('click', whereAmI);
