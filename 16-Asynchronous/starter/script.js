@@ -226,3 +226,24 @@ const lotteryPromise = new Promise(function (resolve, reject) {
 });
 // To consume the promise
 lotteryPromise.then(res => console.log(res)).catch(err => console.log(err));
+
+// Promisifying setTimeout
+const wait = function (seconds) {
+  // create and return the promise, usually what we do. from there return a promise after
+  // will encapsulate the async operation even further
+  // this is exactly what the fetch() function does, it returns a promise
+
+  // don't even need the reject function because timeout never fails
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+// this function will wait 2 seconds and return a resolved promise
+wait(2)
+  .then(() => {
+    console.log('I waited for 2 seconds');
+    return wait(1);
+  })
+  .then(() => {
+    console.log('I waited for 1 second');
+  });
