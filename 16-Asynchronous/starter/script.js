@@ -254,37 +254,93 @@ const countriesContainer = document.querySelector('.countries');
 
 // callback based api into promise
 
-const getPosition = function () {
-  return new Promise(function (resolve, reject) {
-    // navigator.geolocation.getCurrentPosition(
-    //   position => resolve(position),
-    //   err => reject(new Error(err))
-    // );
-    navigator.geolocation.getCurrentPosition(resolve, reject);
+// const getPosition = function () {
+//   return new Promise(function (resolve, reject) {
+//     // navigator.geolocation.getCurrentPosition(
+//     //   position => resolve(position),
+//     //   err => reject(new Error(err))
+//     // );
+//     navigator.geolocation.getCurrentPosition(resolve, reject);
+//   });
+// };
+// getPosition().then(position => console.log(position));
+
+// const whereAmI = function () {
+//   getPosition()
+//     .then(pos => {
+//       const { latitude: lat, longitude: lng } = pos.coords;
+//       return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+//     })
+//     .then(res => {
+//       if (!res.ok) throw new Error(`Problem with geocoding ${res.status}`);
+//       return res.json();
+//     })
+//     .then(data => {
+//       console.log(`You are in ${data.city}, ${data.country}`);
+//       return fetch(`https://restcountries.com/v2/name/${data.country}`);
+//     })
+//     .then(res => {
+//       if (!res.ok) throw new Error(`Problem with geocoding ${res.status}`);
+//       return res.json();
+//     })
+//     .then(data => renderCountry(data[0]))
+//     .catch(err => console.log(`${err.message}`))
+//     .finally((countriesContainer.style.opacity = 1));
+// };
+// btn.addEventListener('click', whereAmI);
+
+// ///////////////////////////////// CHALLANGE #2 //////////////////////////////////////
+
+// making img obj as global variable to access anywhere
+const imgContainer = document.querySelector('.images');
+
+// promisifying wait callback
+const wait = function (seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
   });
 };
-getPosition().then(position => console.log(position));
 
-const whereAmI = function () {
-  getPosition()
-    .then(pos => {
-      const { latitude: lat, longitude: lng } = pos.coords;
-      return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
-    })
-    .then(res => {
-      if (!res.ok) throw new Error(`Problem with geocoding ${res.status}`);
-      return res.json();
-    })
-    .then(data => {
-      console.log(`You are in ${data.city}, ${data.country}`);
-      return fetch(`https://restcountries.com/v2/name/${data.country}`);
-    })
-    .then(res => {
-      if (!res.ok) throw new Error(`Problem with geocoding ${res.status}`);
-      return res.json();
-    })
-    .then(data => renderCountry(data[0]))
-    .catch(err => console.log(`${err.message}`))
-    .finally((countriesContainer.style.opacity = 1));
+// new function that returns a promise
+const createImage = function (imgPath) {
+  return new Promise(function (resolve, reject) {
+    const imgObject = document.createElement('img');
+    imgObject.src = imgPath;
+
+    imgObject.addEventListener('load', function () {
+      imgContainer.append(imgObject);
+      resolve(imgObject);
+    });
+    imgObject.addEventListener('error', function () {
+      reject(new Error('Image not found!'));
+    });
+  });
 };
-btn.addEventListener('click', whereAmI);
+
+let currentImg;
+
+createImage('img/img-1.jpg')
+  .then(img => {
+    currentImg = img;
+    // at first don't really need to do anything because image is pended to container
+    console.log('Image 1 loaded');
+    // second part of exercise requires to pronise with wait
+    return wait(2);
+  })
+  .then(() => {
+    console.log(`Hiding image`);
+    currentImg.style.display = 'none';
+    return wait(0.2);
+  })
+  .then(() => {
+    return createImage('img/img-2.jpg');
+  })
+  .then(img => {
+    currentImg = img;
+    console.log('Image 2 loaded');
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+  })
+  .catch(err => console.log(err));
