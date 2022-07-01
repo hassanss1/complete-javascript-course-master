@@ -59,10 +59,10 @@ const countriesContainer = document.querySelector('.countries');
 //   // countriesContainer.style.opacity = 1;
 // };
 
-// const renderErr = message => {
-//   countriesContainer.insertAdjacentText('beforeend', message);
-//   // countriesContainer.style.opacity = 1;
-// };
+const renderErr = message => {
+  countriesContainer.insertAdjacentText('beforeend', message);
+  // countriesContainer.style.opacity = 1;
+};
 // // // AJAX call country 1
 // // const getCountryAndNeighbour = country => {
 // //   // Old-school XMLHttpRequest way
@@ -291,56 +291,93 @@ const countriesContainer = document.querySelector('.countries');
 
 // ///////////////////////////////// CHALLANGE #2 //////////////////////////////////////
 
-// making img obj as global variable to access anywhere
-const imgContainer = document.querySelector('.images');
+// // making img obj as global variable to access anywhere
+// const imgContainer = document.querySelector('.images');
 
-// promisifying wait callback
-const wait = function (seconds) {
-  return new Promise(function (resolve) {
-    setTimeout(resolve, seconds * 1000);
-  });
-};
+// // promisifying wait callback
+// const wait = function (seconds) {
+//   return new Promise(function (resolve) {
+//     setTimeout(resolve, seconds * 1000);
+//   });
+// };
 
-// new function that returns a promise
-const createImage = function (imgPath) {
+// // new function that returns a promise
+// const createImage = function (imgPath) {
+//   return new Promise(function (resolve, reject) {
+//     const imgObject = document.createElement('img');
+//     imgObject.src = imgPath;
+
+//     imgObject.addEventListener('load', function () {
+//       imgContainer.append(imgObject);
+//       resolve(imgObject);
+//     });
+//     imgObject.addEventListener('error', function () {
+//       reject(new Error('Image not found!'));
+//     });
+//   });
+// };
+
+// let currentImg;
+
+// createImage('img/img-1.jpg')
+//   .then(img => {
+//     currentImg = img;
+//     // at first don't really need to do anything because image is pended to container
+//     console.log('Image 1 loaded');
+//     // second part of exercise requires to pronise with wait
+//     return wait(2);
+//   })
+//   .then(() => {
+//     console.log(`Hiding image`);
+//     currentImg.style.display = 'none';
+//     return wait(0.2);
+//   })
+//   .then(() => {
+//     return createImage('img/img-2.jpg');
+//   })
+//   .then(img => {
+//     currentImg = img;
+//     console.log('Image 2 loaded');
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currentImg.style.display = 'none';
+//   })
+//   .catch(err => console.log(err));
+
+// ////////////////////////////////////// Consuming promises with async / await //////////////////////////////////////
+const getPosition = function () {
   return new Promise(function (resolve, reject) {
-    const imgObject = document.createElement('img');
-    imgObject.src = imgPath;
-
-    imgObject.addEventListener('load', function () {
-      imgContainer.append(imgObject);
-      resolve(imgObject);
-    });
-    imgObject.addEventListener('error', function () {
-      reject(new Error('Image not found!'));
-    });
+    // navigator.geolocation.getCurrentPosition(
+    //   position => resolve(position),
+    //   err => reject(new Error(err))
+    // );
+    navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 };
+getPosition().then(position => console.log(position));
 
-let currentImg;
+const whereAmI = async function () {
+  try {
+    // Geolocation
+    const pos = await getPosition();
+    const { latitude: lat, longitude: lng } = pos.coords;
 
-createImage('img/img-1.jpg')
-  .then(img => {
-    currentImg = img;
-    // at first don't really need to do anything because image is pended to container
-    console.log('Image 1 loaded');
-    // second part of exercise requires to pronise with wait
-    return wait(2);
-  })
-  .then(() => {
-    console.log(`Hiding image`);
-    currentImg.style.display = 'none';
-    return wait(0.2);
-  })
-  .then(() => {
-    return createImage('img/img-2.jpg');
-  })
-  .then(img => {
-    currentImg = img;
-    console.log('Image 2 loaded');
-    return wait(2);
-  })
-  .then(() => {
-    currentImg.style.display = 'none';
-  })
-  .catch(err => console.log(err));
+    // Reversed geocoding
+    const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    // we need to throw new error here because fetch rejects in particular case (403, 404) so we need more awareness on errors here
+    if (!resGeo.ok) throw new Error(`Problem getting country`);
+
+    const dataGeo = await resGeo.json();
+
+    // Country data
+    const res = await fetch(
+      `https://restcountries.com/v2/name/${dataGeo.country}`
+    );
+    const data = await res.json();
+    renderCountry(data[0]);
+  } catch (err) {
+    renderErr(`${err.message}`);
+  }
+};
+whereAmI();
