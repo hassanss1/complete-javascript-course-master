@@ -399,31 +399,82 @@ const renderErr = message => {
 //   console.log(`3: finished getting locatin`);
 // })();
 
-// Running parallel async functions
+// // Running promises in parallel
 
-const getJSON = (url, errorMsg = 'Something went wrong') => {
-  fetch(url).then(response => {
-    if (!response.ok) {
-      throw new Error(`${errorMsg} (${response.status})`);
-    }
+// const getJSON = (url, errorMsg = 'Something went wrong') => {
+//   fetch(url).then(response => {
+//     if (!response.ok) {
+//       throw new Error(`${errorMsg} (${response.status})`);
+//     }
 
-    return response.json();
+//     return response.json();
+//   });
+// };
+
+// const getCountries = async function (c1, c2, c3) {
+//   try {
+//     // const [data1] = await getJSON(`https://restcountries.com/v2/name/${c1}`);
+//     // const [data2] = await getJSON(`https://restcountries.com/v2/name/${c2}`);
+//     // const [data3] = await getJSON(`https://restcountries.com/v2/name/${c3}`);
+//     const data = await Promise.all([
+//       // One rejected promise will make entire thing reject as well.
+// getJSON(`https://restcountries.com/v2/name/${c1}`),
+// getJSON(`https://restcountries.com/v2/name/${c2}`),
+// getJSON(`https://restcountries.com/v2/name/${c3}`),
+//     ]);
+//     console.log(`${data.map(country => country[0].capital)}`);
+//   } catch (err) {
+//     console.log(err.message);
+//   }
+// };
+
+// Promise.race
+// The fulfilling value of this promise.race will be the promise that fulfills first
+(async function () {
+  const res = await Promise.race([
+    getJSON(`https://restcountries.com/v2/name/italy}`),
+    getJSON(`https://restcountries.com/v2/name/egypt`),
+    getJSON(`https://restcountries.com/v2/name/brazil`),
+  ]);
+});
+// Promise.race is very useful against never-ending promises
+
+const timeout = function (seconds) {
+  return new Promise(function (_, reject) {
+    setTimeout(() => {
+      reject(new Error('Request took too long.'));
+    }, seconds * 1000);
   });
 };
+Promise.race([getJSON(`https://restcountries.com/v2/name/brazil`), timeout(1)])
+  .then(res => console.log(res[0]))
+  .catch(err => console.error(err));
 
-const getCountries = async function (c1, c2, c3) {
-  try {
-    // const [data1] = await getJSON(`https://restcountries.com/v2/name/${c1}`);
-    // const [data2] = await getJSON(`https://restcountries.com/v2/name/${c2}`);
-    // const [data3] = await getJSON(`https://restcountries.com/v2/name/${c3}`);
-    const data = await Promise.all([
-      // One rejected promise will make entire thing reject as well.
-      getJSON(`https://restcountries.com/v2/name/${c1}`),
-      getJSON(`https://restcountries.com/v2/name/${c2}`),
-      getJSON(`https://restcountries.com/v2/name/${c3}`),
-    ]);
-    console.log(`${data.map(country => country[0].capital)}`);
-  } catch (err) {
-    console.log(err.message);
-  }
-};
+// Promise.allSettled
+Promise.allSettled([
+  Promise.resolve('Success'),
+  Promise.reject('ERROR'),
+  Promise.resolve('Success'),
+]).then(res => console.log(res));
+
+// contrasts with Promise.all
+Promise.all([
+  Promise.resolve('Success'),
+  Promise.reject('ERROR'),
+  Promise.resolve('Success'),
+])
+  .then(res => console.log(res))
+  .catch(err => console.error(err));
+// this will short-circuit with at least one error
+
+// Promise.any (ES2021)
+// Will return the first FULFILLED promise
+// Similar to .race but here all rejected promises are ignored
+// it returns the first fulfilled promise
+Promise.any([
+  Promise.resolve('Success'),
+  Promise.reject('ERROR'),
+  Promise.resolve('Success'),
+])
+  .then(res => console.log(res))
+  .catch(err => console.error(err));
