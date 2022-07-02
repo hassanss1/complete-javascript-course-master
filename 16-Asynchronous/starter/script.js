@@ -291,33 +291,33 @@ const renderErr = message => {
 
 // ///////////////////////////////// CHALLANGE #2 //////////////////////////////////////
 
-// // making img obj as global variable to access anywhere
-// const imgContainer = document.querySelector('.images');
+// making img obj as global variable to access anywhere
+const imgContainer = document.querySelector('.images');
 
-// // promisifying wait callback
-// const wait = function (seconds) {
-//   return new Promise(function (resolve) {
-//     setTimeout(resolve, seconds * 1000);
-//   });
-// };
+// promisifying wait callback
+const wait = function (seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
 
-// // new function that returns a promise
-// const createImage = function (imgPath) {
-//   return new Promise(function (resolve, reject) {
-//     const imgObject = document.createElement('img');
-//     imgObject.src = imgPath;
+// new function that returns a promise
+const createImage = function (imgPath) {
+  return new Promise(function (resolve, reject) {
+    const imgObject = document.createElement('img');
+    imgObject.src = imgPath;
 
-//     imgObject.addEventListener('load', function () {
-//       imgContainer.append(imgObject);
-//       resolve(imgObject);
-//     });
-//     imgObject.addEventListener('error', function () {
-//       reject(new Error('Image not found!'));
-//     });
-//   });
-// };
+    imgObject.addEventListener('load', function () {
+      imgContainer.append(imgObject);
+      resolve(imgObject);
+    });
+    imgObject.addEventListener('error', function () {
+      reject(new Error('Image not found!'));
+    });
+  });
+};
 
-// let currentImg;
+let currentImg;
 
 // createImage('img/img-1.jpg')
 //   .then(img => {
@@ -428,53 +428,99 @@ const renderErr = message => {
 //   }
 // };
 
-// Promise.race
-// The fulfilling value of this promise.race will be the promise that fulfills first
-(async function () {
-  const res = await Promise.race([
-    getJSON(`https://restcountries.com/v2/name/italy}`),
-    getJSON(`https://restcountries.com/v2/name/egypt`),
-    getJSON(`https://restcountries.com/v2/name/brazil`),
-  ]);
-});
-// Promise.race is very useful against never-ending promises
+// // Promise.race
+// // The fulfilling value of this promise.race will be the promise that fulfills first
+// (async function () {
+//   const res = await Promise.race([
+//     getJSON(`https://restcountries.com/v2/name/italy}`),
+//     getJSON(`https://restcountries.com/v2/name/egypt`),
+//     getJSON(`https://restcountries.com/v2/name/brazil`),
+//   ]);
+// });
+// // Promise.race is very useful against never-ending promises
 
-const timeout = function (seconds) {
-  return new Promise(function (_, reject) {
-    setTimeout(() => {
-      reject(new Error('Request took too long.'));
-    }, seconds * 1000);
-  });
+// const timeout = function (seconds) {
+//   return new Promise(function (_, reject) {
+//     setTimeout(() => {
+//       reject(new Error('Request took too long.'));
+//     }, seconds * 1000);
+//   });
+// };
+// Promise.race([getJSON(`https://restcountries.com/v2/name/brazil`), timeout(1)])
+//   .then(res => console.log(res[0]))
+//   .catch(err => console.error(err));
+
+// // Promise.allSettled
+// Promise.allSettled([
+//   Promise.resolve('Success'),
+//   Promise.reject('ERROR'),
+//   Promise.resolve('Success'),
+// ]).then(res => console.log(res));
+
+// // contrasts with Promise.all
+// Promise.all([
+//   Promise.resolve('Success'),
+//   Promise.reject('ERROR'),
+//   Promise.resolve('Success'),
+// ])
+//   .then(res => console.log(res))
+//   .catch(err => console.error(err));
+// // this will short-circuit with at least one error
+
+// // Promise.any (ES2021)
+// // Will return the first FULFILLED promise
+// // Similar to .race but here all rejected promises are ignored
+// // it returns the first fulfilled promise
+// Promise.any([
+//   Promise.resolve('Success'),
+//   Promise.reject('ERROR'),
+//   Promise.resolve('Success'),
+// ])
+//   .then(res => console.log(res))
+//   .catch(err => console.error(err));
+
+// /////////////////////////////////// CODING CHALLANGE #3 /////////////////////////////
+const loadNPause = async function () {
+  try {
+    const loadImage1 = await createImage(`img/img-1.jpg`);
+    currentImg = loadImage1;
+    console.log('Image 1 loaded');
+    await wait(2);
+    currentImg.style.display = 'none';
+    await wait(0.2);
+
+    const loadImage2 = await createImage(`img/img-2.jpg`);
+    currentImg = loadImage2;
+    console.log('Image 2 loaded');
+    await wait(2);
+    currentImg.style.display = 'none';
+    await wait(0.2);
+
+    const loadImage3 = await createImage(`img/img-3.jpg`);
+    console.log('Image 3 loaded');
+    await wait(2);
+  } catch (err) {
+    console.error(error);
+  }
 };
-Promise.race([getJSON(`https://restcountries.com/v2/name/brazil`), timeout(1)])
-  .then(res => console.log(res[0]))
-  .catch(err => console.error(err));
+// loadNPause();
 
-// Promise.allSettled
-Promise.allSettled([
-  Promise.resolve('Success'),
-  Promise.reject('ERROR'),
-  Promise.resolve('Success'),
-]).then(res => console.log(res));
+// Loading an array of imagepaths
+let imgArr = ['img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg'];
 
-// contrasts with Promise.all
-Promise.all([
-  Promise.resolve('Success'),
-  Promise.reject('ERROR'),
-  Promise.resolve('Success'),
-])
-  .then(res => console.log(res))
-  .catch(err => console.error(err));
-// this will short-circuit with at least one error
-
-// Promise.any (ES2021)
-// Will return the first FULFILLED promise
-// Similar to .race but here all rejected promises are ignored
-// it returns the first fulfilled promise
-Promise.any([
-  Promise.resolve('Success'),
-  Promise.reject('ERROR'),
-  Promise.resolve('Success'),
-])
-  .then(res => console.log(res))
-  .catch(err => console.error(err));
+const loadAll = async function (imgArr) {
+  try {
+    const imgs = imgArr.map(async img => {
+      // This will not return the fulfilled, instead it will return a promise
+      return await createImage(img);
+    });
+    console.log(imgs);
+    // So we use the Promise.all because it takes in array of promises and return array of its fulfilled values
+    const imgsEl = await Promise.all(imgs);
+    console.log(imgsEl);
+    imgsEl.forEach(img => img.classList.add('parallel'));
+  } catch (err) {
+    console.error(err);
+  }
+};
+loadAll(['img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg']);
