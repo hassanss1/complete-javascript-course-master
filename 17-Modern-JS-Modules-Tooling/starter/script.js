@@ -15,5 +15,29 @@
 
 // Usually never mix named and default exports in the same module
 // but we can do it and it would look like
-import add from './shoppingCart.js';
-add('pizza', 2);
+// import add from './shoppingCart.js';
+// add('pizza', 2);
+
+// showin top-level await
+// This blocks the execution of the entire module
+// // can be useful in some situations but can also be very harmful
+// console.log('Start fetching data');
+// const res = await fetch(`'https://jsonplaceholder.typicode.com/posts'`);
+// const data = await res.json();
+// console.log(data);
+
+const getLastPost = async function () {
+  const res = await fetch(`'https://jsonplaceholder.typicode.com/posts'`);
+  const data = await res.json();
+  console.log(data);
+
+  return { title: data.at(-1).title, text: data.at(-1).body };
+};
+const lastPost = getLastPost();
+
+// not very clean...
+lastPost.then(last => console.log(last));
+
+// use top-level await instead
+const lastPost2 = await getLastPost();
+console.log(lastPost2);
