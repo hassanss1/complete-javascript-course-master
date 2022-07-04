@@ -26,18 +26,55 @@
 // const data = await res.json();
 // console.log(data);
 
-const getLastPost = async function () {
-  const res = await fetch(`'https://jsonplaceholder.typicode.com/posts'`);
-  const data = await res.json();
-  console.log(data);
+// const getLastPost = async function () {
+//   const res = await fetch(`'https://jsonplaceholder.typicode.com/posts'`);
+//   const data = await res.json();
+//   console.log(data);
 
-  return { title: data.at(-1).title, text: data.at(-1).body };
-};
-const lastPost = getLastPost();
+//   return { title: data.at(-1).title, text: data.at(-1).body };
+// };
+// const lastPost = getLastPost();
 
-// not very clean...
-lastPost.then(last => console.log(last));
+// // not very clean...
+// lastPost.then(last => console.log(last));
 
-// use top-level await instead
-const lastPost2 = await getLastPost();
-console.log(lastPost2);
+// // use top-level await instead
+// const lastPost2 = await getLastPost();
+// console.log(lastPost2);
+
+// // Module patter implemented
+// // usualy write iff immediately invoked function
+// // purpose: create new scope and return data just once
+// const ShoppingCart2 = (function () {
+//   const cart = [];
+//   const shippingCost = 10;
+//   const totalPrice = 247;
+//   const totalQuantity = 23;
+//   const addToCart = function (product, quantity) {
+//     cart.push({ product, quantity });
+//     console.log(`${quantity}${product} added to cart`);
+//   };
+//   const orderStock = function (product, quantity) {
+//     console.log(`${quantity}${product} ordered from supplier`);
+//   };
+
+//   // To return some of this in order to return a public API
+//   return {
+//     addToCart,
+//     cart,
+//     totalPrice,
+//     totalQuantity,
+//   };
+// })();
+
+// ShoppingCart2.addToCart('apple', 4);
+// ShoppingCart2.addToCart('pizza', 2);
+
+// // Export in node.js part of CommonJS specification
+// export.addTocart = function (product, quantity) {
+//   cart.push({ product, quantity });
+//   console.log(`${quantity} ${product} added to cart`);
+// };
+
+// // Import in node.js part of CommonJS specification
+// const { addTocart } = require('./shoppingCart.js')
