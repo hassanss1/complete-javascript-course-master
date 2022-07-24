@@ -1,4 +1,4 @@
-var budget = [
+const budget = [
   { value: 250, description: 'Sold old TV 📺', user: 'jonas' },
   { value: -45, description: 'Groceries 🥑', user: 'jonas' },
   { value: 3500, description: 'Monthly salary 👩‍💻', user: 'jonas' },
@@ -9,56 +9,51 @@ var budget = [
   { value: -1800, description: 'New Laptop 💻', user: 'jonas' },
 ];
 
-var limits = {
+const spendingLimits = {
   jonas: 1500,
   matilda: 100,
 };
+const getLimit = (limits, user) => limits?.[user] ?? 0;
 
-var add = function (value, description, user) {
-  if (!user) user = 'jonas';
-  user = user.toLowerCase();
+const addExpense = function (
+  state,
+  limits,
+  value,
+  description,
+  user = 'jonas'
+) {
+  const cleanUser = user.toLowerCase();
 
-  var lim;
-  if (limits[user]) {
-    lim = limits[user];
-  } else {
-    lim = 0;
-  }
-
-  if (value <= lim) {
-    budget.push({ value: -value, description: description, user: user });
-  }
+  return value <= getLimit(limits, cleanUser)
+    ? [...state, { value: -value, description, user: cleanUser }]
+    : budget;
 };
-add(10, 'Pizza 🍕');
-add(100, 'Going to movies 🍿', 'Matilda');
-add(200, 'Stuff', 'Jay');
-console.log(budget);
+const newBudget1 = addExpense(budget, 10, 'Pizza 🍕');
+console.log(newBudget1);
+const newBudget2 = addExpense(newBudget1, 100, 'Going to movies 🍿', 'Matilda');
+const newBudget3 = addExpense(newBudget2, 200, 'Stuff', 'Jay');
 
-var check = function () {
-  for (var el of budget) {
-    var lim;
-    if (limits[el.user]) {
-      lim = limits[el.user];
-    } else {
-      lim = 0;
-    }
+const checkExpenses = (state, limits) =>
+  // This is adding the flag property to each key in budget - not pure
+  // So to not mutate variables outside, lets make a copy
+  state.map(entry =>
+    entry.value < -getLimit(limits, entry.user)
+      ? { ...entry, flag: 'limit' }
+      : entry
+  );
+const finalExpense = checkExpenses(newBudget1, spendingLimits);
 
-    if (el.value < -lim) {
-      el.flag = 'limit';
-    }
-  }
+const logBigExpenses = function (state, bigLimit) {
+  const bigExpense = state
+    .filter(entry => entry.value <= -bigLimit)
+    .map(entry => entry.description.slice(-2))
+    .join(' / ');
+  // let output = '';
+  // for (const entry of budget) {
+  //   output +=
+  //     entry.value <= -bigLimit ? `${entry.description.slice(-2)} /` : '';
+  // }
+  // output = output.slice(0, -2); // Remove last '/ '
+  console.log(bigExpense);
 };
-check();
-
-console.log(budget);
-
-var bigExpenses = function (limit) {
-  var output = '';
-  for (var el of budget) {
-    if (el.value <= -limit) {
-      output += el.description.slice(-2) + ' / '; // Emojis are 2 chars
-    }
-  }
-  output = output.slice(0, -2); // Remove last '/ '
-  console.log(output);
-};
+logBigExpenses(finalExpense, 500);

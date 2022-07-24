@@ -77,4 +77,32 @@
 // };
 
 // // Import in node.js part of CommonJS specification
-// const { addTocart } = require('./shoppingCart.js')
+// const { addTocart } = require('./shoppingCart.js');
+
+// import cloneDeep from 'lodash-es';
+
+// const state = {
+//   cart: [
+//     { product: 'bread', quantity: 5 },
+//     { product: 'pizza', quantity: 3 },
+//   ],
+//   user: { loggedIn: true },
+// };
+
+// // javascript to copy an object
+// const stateClone = Object.assign({}, state);
+// // this will also change in state so we use lodash
+// const stateDeepClone = cloneDeep(state);
+
+// // but if you change something
+// state.user.loggedIn = false;
+// console.log(stateClone);
+
+// console.log(stateDeepClone);
+
+const today = new Date();
+console.log(`This is today: ${today}`);
+
+const tomorrow = new Date();
+tomorrow.setDate(today.getDate() + 15);
+console.log(tomorrow);
