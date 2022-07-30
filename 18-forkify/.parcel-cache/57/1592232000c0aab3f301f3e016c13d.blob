@@ -1,0 +1,13 @@
+// first try fetching the api
+// https://forkify-api.herokuapp.com/api/v2/recipes/5ed6604591c37cdc054bc886
+const loadRecipe = async function () {
+  try {
+    const response = await fetch(`https://forkify-api.herokuapp.ceeom/api/v2/recipes/5ed6604591c37cdc054bc886`);
+    const data = await response.json();
+    console.log(response);
+  } catch (err) {
+    alert(err);
+  }
+};
+
+loadRecipe();

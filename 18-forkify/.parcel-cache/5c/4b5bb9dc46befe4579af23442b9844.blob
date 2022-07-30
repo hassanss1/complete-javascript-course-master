@@ -1,0 +1,5 @@
+// first try fetching the api
+// https://forkify-api.herokuapp.com/api/v2/recipes
+const loadRecipe = async function () {
+  return await fetch('https://forkify-api.herokuapp.com/api/v2/recipes');
+};
