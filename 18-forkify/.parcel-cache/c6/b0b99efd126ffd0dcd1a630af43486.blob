@@ -1,0 +1,31 @@
+"use strict";
+
+require("core-js/modules/es.regexp.flags.js");
+
+require("core-js/modules/web.immediate.js");
+
+var _model = _interopRequireDefault(require("./model"));
+
+var _RecipeView = require("./views/RecipeView");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const controlRecipes = async function () {
+  try {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    (0, _RecipeView.renderSpinner)();
+    const {
+      data
+    } = await _model.default.getJSON(id);
+
+    const recipe = _model.default.loadRecipe(data); // Rendering html
+
+
+    (0, _RecipeView.generateRecipeMarkup)(state.recipe);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+['hashchange', 'load'].forEach(ev => window.addEventListener(ev, controlRecipes));
