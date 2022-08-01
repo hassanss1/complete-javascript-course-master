@@ -472,10 +472,10 @@ const controlRecipes = async function () {
 
 const controlSearchResults = async function () {
   try {
-    // 1) get query string from view
+    // get query string from view
     const query = _searchView.default.getQuery();
 
-    if (!query) return; // 2) get results from model
+    if (!query) return; // get results from model
 
     await model.loadSearchResults(query);
     console.log(model.state.search.results); // resultsView.render(model.state.search.results);
@@ -2431,19 +2431,13 @@ class SearchView {
   #parentElement = document.querySelector('.search');
 
   getQuery() {
-    const query = this.#parentElement.querySelector('.search__field').value;
-    this.#clearInput();
-    return query;
-  }
-
-  #clearInput() {
-    this.#parentElement.querySelector('.search__field').value = '';
+    return this.#parentElement.querySelector('.search__field').value;
   }
 
   addHandlerSearch(handler) {
     this.#parentElement.addEventListener('submit', function (e) {
       e.preventDefault;
-      handler();
+      handler;
     });
   }
 
