@@ -1,3 +1,4 @@
+import { API_URL } from './config';
 import { getJSON } from './helpers';
 
 export const state = {
@@ -6,7 +7,7 @@ export const state = {
 
 export async function loadRecipe(id) {
   try {
-    const data = await getJSON(id);
+    const data = await getJSON(`${API_URL}${id}`);
 
     const { recipe } = data.data;
     state.recipe = {

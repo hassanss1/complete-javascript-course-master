@@ -1853,8 +1853,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.loadRecipe = loadRecipe;
 exports.state = void 0;
 
-var _config = require("./config");
-
 var _helpers = require("./helpers");
 
 const state = {
@@ -1864,7 +1862,7 @@ exports.state = state;
 
 async function loadRecipe(id) {
   try {
-    const data = await (0, _helpers.getJSON)(`${_config.API_URL}${id}`);
+    const data = await (0, _helpers.getJSON)();
     const {
       recipe
     } = data.data;
@@ -1882,7 +1880,7 @@ async function loadRecipe(id) {
     console.error(err);
   }
 }
-},{"./helpers":"b1ca0bdc3f3f9e95347882646f46b1d4","./config":"26812f7d6f7d8fabc379365ccfa03163"}],"b1ca0bdc3f3f9e95347882646f46b1d4":[function(require,module,exports) {
+},{"./helpers":"b1ca0bdc3f3f9e95347882646f46b1d4"}],"b1ca0bdc3f3f9e95347882646f46b1d4":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1891,12 +1889,10 @@ Object.defineProperty(exports, "__esModule", {
 exports.getJSON = getJSON;
 exports.timeout = void 0;
 
-var _config = require("./config");
-
 const timeout = async function (seconds) {
   return new Promise(function (_, reject) {
     setTimeout(function (_, reject) {
-      reject(new Error(`Request took too long! Timeout after ${seconds} seconds`));
+      reject(new Error(`Request took too long! Timeout after ${s} seconds`));
     }, seconds * 1000);
   });
 };
@@ -1904,22 +1900,11 @@ const timeout = async function (seconds) {
 exports.timeout = timeout;
 
 async function getJSON(url) {
-  const response = await Promise.race([fetch(url), timeout(_config.TIMEOUT_SEC)]);
+  const response = await Promise.race([fetch(url), timeout(10)]);
   const data = await response.json();
   if (!response.ok) throw new Error(`${data.message} ${response.status}`);
   return data;
 }
-},{"./config":"26812f7d6f7d8fabc379365ccfa03163"}],"26812f7d6f7d8fabc379365ccfa03163":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.TIMEOUT_SEC = exports.API_URL = void 0;
-const API_URL = `https://forkify-api.herokuapp.com/api/v2/recipes/`;
-exports.API_URL = API_URL;
-const TIMEOUT_SEC = 10;
-exports.TIMEOUT_SEC = TIMEOUT_SEC;
 },{}],"6d4d2b0770c59838b217138dc90e9cff":[function(require,module,exports) {
 "use strict";
 

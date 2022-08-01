@@ -1853,8 +1853,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.loadRecipe = loadRecipe;
 exports.state = void 0;
 
-var _config = require("./config");
-
 var _helpers = require("./helpers");
 
 const state = {
@@ -1864,7 +1862,7 @@ exports.state = state;
 
 async function loadRecipe(id) {
   try {
-    const data = await (0, _helpers.getJSON)(`${_config.API_URL}${id}`);
+    const data = await (0, _helpers.getJSON)(`${API_URL}${id}`);
     const {
       recipe
     } = data.data;
@@ -1882,7 +1880,7 @@ async function loadRecipe(id) {
     console.error(err);
   }
 }
-},{"./helpers":"b1ca0bdc3f3f9e95347882646f46b1d4","./config":"26812f7d6f7d8fabc379365ccfa03163"}],"b1ca0bdc3f3f9e95347882646f46b1d4":[function(require,module,exports) {
+},{"./helpers":"b1ca0bdc3f3f9e95347882646f46b1d4"}],"b1ca0bdc3f3f9e95347882646f46b1d4":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
