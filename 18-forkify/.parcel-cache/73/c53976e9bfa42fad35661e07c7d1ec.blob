@@ -466,11 +466,7 @@ const controlRecipes = async function () {
   }
 };
 
-const init = function () {
-  _RecipeView.default.addHandlerRender(controlRecipes);
-};
-
-init();
+const init = function () {};
 },{"core-js/modules/es.regexp.flags.js":"69c14483c7f90583888879597ac9d2d3","core-js/modules/web.immediate.js":"140df4f8e97a45c53c66fead1f5a9e92","./model":"47ecf14258f00bde4534498b74632124","./views/RecipeView":"6d4d2b0770c59838b217138dc90e9cff"}],"69c14483c7f90583888879597ac9d2d3":[function(require,module,exports) {
 var global = require('../internals/global');
 
@@ -2050,9 +2046,7 @@ class RecipeView {
             </div>`;
   }
 
-  addHandlerRender(controlRecipes) {
-    ['hashchange', 'load'].forEach(ev => window.addEventListener(ev, controlRecipes));
-  }
+  addHandlerRender(controlRecipes) {}
 
 }
 
