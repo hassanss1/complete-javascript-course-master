@@ -441,6 +441,8 @@ require("core-js/modules/es.regexp.flags.js");
 
 require("core-js/modules/web.immediate.js");
 
+var _helpers = require("./helpers");
+
 var model = _interopRequireWildcard(require("./model"));
 
 var _RecipeView = _interopRequireDefault(require("./views/RecipeView"));
@@ -455,7 +457,7 @@ const controlRecipes = async function () {
   try {
     const id = window.location.hash.slice(1);
     if (!id) return;
-    await model.loadRecipe(id);
+    Promise.race(await model.loadRecipe(id), (0, _helpers.timeout)(10));
 
     _RecipeView.default.renderSpinner(); // Rendering html
 
@@ -467,7 +469,7 @@ const controlRecipes = async function () {
 };
 
 ['hashchange', 'load'].forEach(ev => window.addEventListener(ev, controlRecipes));
-},{"core-js/modules/es.regexp.flags.js":"69c14483c7f90583888879597ac9d2d3","core-js/modules/web.immediate.js":"140df4f8e97a45c53c66fead1f5a9e92","./model":"47ecf14258f00bde4534498b74632124","./views/RecipeView":"6d4d2b0770c59838b217138dc90e9cff"}],"69c14483c7f90583888879597ac9d2d3":[function(require,module,exports) {
+},{"core-js/modules/es.regexp.flags.js":"69c14483c7f90583888879597ac9d2d3","core-js/modules/web.immediate.js":"140df4f8e97a45c53c66fead1f5a9e92","./model":"47ecf14258f00bde4534498b74632124","./views/RecipeView":"6d4d2b0770c59838b217138dc90e9cff","./helpers":"b1ca0bdc3f3f9e95347882646f46b1d4"}],"69c14483c7f90583888879597ac9d2d3":[function(require,module,exports) {
 var global = require('../internals/global');
 
 var DESCRIPTORS = require('../internals/descriptors');
@@ -1892,15 +1894,15 @@ exports.timeout = void 0;
 const timeout = async function (seconds) {
   return new Promise(function (_, reject) {
     setTimeout(function (_, reject) {
-      reject(new Error(`Request took too long! Timeout after ${s} seconds`));
-    }, seconds * 1000);
+      reject(new Error(`Request took too long! Timeout after ${s} seconds`), s * 1000);
+    });
   });
 };
 
 exports.timeout = timeout;
 
 async function getJSON(id) {
-  const response = await Promise.race([fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${id}`), timeout(10)]);
+  const response = await fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${id}`);
   const data = await response.json();
   if (!response.ok) throw new Error(`${data.message} ${response.status}`);
   return data;

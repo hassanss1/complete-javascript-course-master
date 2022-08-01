@@ -1,19 +1,12 @@
+import { getJSON } from './helpers';
+
 export const state = {
   recipe: {},
 };
 
-const _timeout = async function (seconds) {
-  await setTimeout();
-};
-
 export async function loadRecipe(id) {
   try {
-    const response = await fetch(
-      `https://forkify-api.herokuapp.com/api/v2/recipes/${id}`
-    );
-    const data = await response.json();
-
-    if (!response.ok) throw new Error(`${data.message} ${response.status}`);
+    const data = await getJSON(id);
 
     const { recipe } = data.data;
     state.recipe = {

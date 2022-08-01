@@ -1900,7 +1900,7 @@ const timeout = async function (seconds) {
 exports.timeout = timeout;
 
 async function getJSON(id) {
-  const response = await Promise.race([fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${id}`), timeout(10)]);
+  const response = await Promise.race(fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${id}`), timeout(10));
   const data = await response.json();
   if (!response.ok) throw new Error(`${data.message} ${response.status}`);
   return data;

@@ -1,0 +1,24 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getJSON = getJSON;
+exports.timeout = void 0;
+
+const timeout = async function (seconds) {
+  return new Promise(function (_, reject) {
+    setTimeout(function (_, reject) {
+      reject(new Error(`Request took too long! Timeout after ${s} seconds`), s * 1000);
+    });
+  });
+};
+
+exports.timeout = timeout;
+
+async function getJSON(id) {
+  const response = await fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${id}`);
+  const data = await response.json();
+  if (!response.ok) throw new Error(`${data.message} ${response.status}`);
+  return data;
+}
