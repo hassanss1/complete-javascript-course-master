@@ -1,0 +1,51 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.loadRecipe = loadRecipe;
+exports.state = exports.loadSearchResults = void 0;
+
+var _config = require("./config");
+
+var _helpers = require("./helpers");
+
+const state = {
+  recipe: {},
+  search: {}
+};
+exports.state = state;
+
+async function loadRecipe(id) {
+  try {
+    const data = await (0, _helpers.getJSON)(`${_config.API_URL}${id}`);
+    const {
+      recipe
+    } = data.data;
+    state.recipe = {
+      cookingTime: recipe.cooking_time,
+      id: recipe.id,
+      imageUrl: recipe.image_url,
+      ingredients: recipe.ingredients,
+      publisher: recipe.publisher,
+      servings: recipe.servings,
+      sourceUrl: recipe.source_url,
+      title: recipe.title
+    };
+  } catch (err) {
+    throw err;
+  }
+}
+
+const loadSearchResults = async function (query) {
+  try {
+    const data = await (0, _helpers.getJSON)(`${_config.API_URL}?search=${query}`);
+    console.log(data.data.recipes);
+    state.search = {};
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.loadSearchResults = loadSearchResults;
+loadSearchResults('pizza');
