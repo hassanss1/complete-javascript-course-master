@@ -1,6 +1,6 @@
 import icons from 'url:../../img/icons.svg';
 import fracty from 'fracty';
-import View from './view';
+import View from './View';
 class RecipeView extends View {
   _parentElement = document.querySelector('.recipe');
   _errorMessage = 'We could not find your recipe. Please try another one!';
