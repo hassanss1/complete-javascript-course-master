@@ -1,11 +1,12 @@
 {
   "type": "module",
-  "name": "18-forkify",
+  "name": "forkify",
   "version": "1.0.0",
-  "description": "Recipes page",
+  "description": "Recipes application",
+  "default": "index.html",
   "scripts": {
     "start": "parcel starter/index.html",
-    "build": "parcel build starter/index.html"
+    "build": "parcel build starter/index.html --dist-dir ./dist"
   },
   "author": "Hassan",
   "license": "ISC",
