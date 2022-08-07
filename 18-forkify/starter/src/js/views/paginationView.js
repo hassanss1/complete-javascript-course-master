@@ -2,7 +2,20 @@ import View from './view';
 import icons from 'url:../../img/icons.svg';
 
 class PaginationView extends View {
-  _parentElement = document.querySelector('.results');
+  _parentElement = document.querySelector('.pagination');
+
+  addHandlerPagination(handler) {
+    // this must listen to button clicks
+    this._parentElement.addEventListener('click', function (e) {
+      const btn = e.target.closest('.btn--inline');
+
+      if (!btn) return;
+      const goToPage = +btn.dataset.goto;
+      handler(goToPage);
+    });
+
+    // And also must read btn dataset.goto
+  }
   // The generateMarkup name is standard because it will be called by View.render()
   _generateMarkup() {
     const curPage = this._data.page;
@@ -30,9 +43,11 @@ class PaginationView extends View {
 
   _generateButtonMarkup(type, curPage) {
     return `
-          <button class="btn--inline pagination__btn--${
-            type === 'next' ? 'next' : 'prev'
-          }">
+          <button data-goto="${
+            type === 'next' ? curPage + 1 : curPage - 1
+          }" class="btn--inline pagination__btn--${
+      type === 'next' ? 'next' : 'prev'
+    }">
             <span>Page ${type === 'next' ? curPage + 1 : curPage - 1}</span>
             <svg class="search__icon">
               <use href="${icons}#icon-arrow-${

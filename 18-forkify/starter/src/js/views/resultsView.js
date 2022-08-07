@@ -1,13 +1,11 @@
 import View from './view';
-import icons from 'url:../../img/icons.svg';
 
 class ResultsView extends View {
-  _parentElement = document.querySelector('.results');
+  _parentElement = document.querySelector('.search-results');
   _errorMessage = 'We could not find your recipe. Please try another one!';
   _message = '';
 
   _generateMarkup() {
-    console.log(this._data);
     return this._data.map(this._generateMarkupPreview).join('');
   }
   _generateMarkupPreview(result) {
